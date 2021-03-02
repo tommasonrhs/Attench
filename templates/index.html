@@ -1,32 +1,499 @@
 <!doctype html>
+
+
 <html>
     <head>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
     </head>
-    <body>
-        <h1>Flask & Twilio Video Conference</h1>
-        <form>
-            <label for="username">Name: </label>
-            <input type="text" name=”username” id="username">
-            <button id="join_leave">Join call</button>
-            <button id="share_screen" disabled>Share screen</button>
-            <button id="toggle_chat" disabled>Toggle chat</button>
-        </form>
-        <p id="count">Disconnected.</p>
-        <div id="root">
-            <div id="container" class="container">
-                <div id="local" class="participant"><div></div><div class="label">Me</div></div>
-                <!-- more participants will be added dynamically here -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+        
+        <style>
+            
+             a,
+             a:link,
+             a:visited,
+             a:hover,
+             a:active{
+        text-decoration: none;
+    }
+    
+           
+             #chat {
+                color:white;
+             }
+    
+           h1 {
+             font-family: lato;
+             position: absolute;
+             left:8.25px;
+             top:282px;
+             border-style: solid;
+             border-width: 18px;
+             border-color:#ece9ec;
+             border-radius: 30px;
+             border-bottom: none;
+             padding-left: 403.5px;
+             padding-right: 402px;
+             padding-top: 17px;
+             padding-bottom: 80px;
+             background-image: linear-gradient(to bottom right, #552583,#552599,#7b3999, #8158b6) ;
+             color:#fdb927;
+              
+             font-weight: bold;
+             letter-spacing: 2px;
+             
+             
+                      
+                     }
+    
+             @media (max-width: 1600px) {
+                h1 {
+                   top:287px;
+                   padding-left:253.5px;
+                   padding-right:252px;
+    
+                }
+             }
+    
+          .small-logo {
+             position: relative;
+             display: inline;
+             top:20px;
+             left: 800px;
+             text-align: center;
+             margin-left: auto;
+             margin-right: auto;
+             width: 15%;
+             height: auto;
+             padding-bottom:0px;
+             
+                      }
+       /* responsive, for small screens, use larger image size */
+    
+       @media (max-width: 1600px) {
+          .small-logo {
+             position: relative;
+             display: inline;
+             top:20px;
+             left: 580px;
+             margin-left:auto;
+             margin-right: auto;
+             width: 19%;
+             height: auto;
+          }
+       }
+    
+      
+          
+          #count {
+          font-family: lato;
+          }
+          #join_view {
+              font-family: lato;
+    
+          }     
+          #join_leave {
+          font-family: lato;
+          }
+          #share_screen {
+             font-family: lato;
+          }
+    
+          #toggle_chat {
+             font-family: lato;
+             }  
+     
+       #container {
+       border-color: #ece9ec;
+       border-width: 18px;
+       border-style: solid;
+       border-radius: 30px;
+       border-top-left-radius: 0px;
+       border-top-right-radius: 0px;
+       max-width: 1250px;
+       background-image: linear-gradient(to bottom right, #552583,#552599,#7b3999, #8158b6) ;
+       position: relative;
+       top: -60px;
+       
+    
+       
+      
+      }
+       
+       @media (max-width: 1600px)  {
+          #container {
+       position: relative;
+       top: -52px;
+       max-width: 950px;
+    
+    
+          }
+       }
+       
+       #local {
+          border-color: #fdb927;
+          border-width: 15px;
+          border-style: solid;
+          border-radius: 5px;
+          margin: 20px;
+       }
+       .participant {
+       border-color: #fdb927;
+       border-width: 15px;
+       border-style:solid;
+       border-radius:5px;
+       margin: 20px;
+       }
+    
+       #header  {
+          background-color:#ece9ec;
+          padding-bottom: 30px;
+          margin: -8px;
+          border: 10px;
+             }
+       
+         
+    
+         #join_view {
+             margin-left: 10px;
+         }
+          #report_issue {
+    
+          
+          background-color: #00bbf9;
+          border-radius: 5px;
+          padding:10px;
+          color: white;
+          text-decoration: none;
+          position: absolute;
+          top: 185px;
+          right: 20px;
+          font-family: lato;
+             
+         
+         }
+    
+          /* responsive, for big screens, lower report issue block */
+    
+          @media (max-width: 1600px) {
+                #report_issue {
+                   top:175px;
+                }
+          }
+    
+          #topline {
+          
+          position:absolute;
+          top:-15px;
+          left:0px;
+          text-align:center;
+          background-color: #00bbf9;
+          font-family:lato;
+          font-size:16px;
+          letter-spacing: 3px;
+          width: 100%;
+          height: 35px;
+          color: white;
+          padding-bottom:2px;
+          font-weight: bold;
+    
+          }
+    
+          #other_rooms {
+         
+          background-color:#ece9ec;
+          border-style: solid;
+          border-radius: 5px;
+          border-color: #ece9ec;
+          width: 202px;
+          position: relative;
+          left:1310px;
+          top: 0px;
+          font-family: lato;
+          padding: 5px;
+    
+          
+          }
+    
+          @media (max-width: 1600px) {
+             #other_rooms {
+                left: 1030px;
+          }
+          }
+    
+          #room_2 {
+          
+          background-color:#00bbf9;
+          border-radius: 5px;
+          border-style: solid;
+          border-color: #00bbf9;
+          width:65px;
+          position: relative;
+          left: 1535px;
+          top: -52px;
+          font-family:lato;
+          padding:5px;
+          text-decoration: none;
+          color: white;
+          align-font: center;
+          }
+    
+          @media (max-width:1600px) {
+          #room_2 {
+          left: 1252px;
+    
+          }
+          }
+    
+          #room_3 {
+             background-color: #00bbf9;
+             width:65px;
+             position:relative;
+             left: 1622px;
+             top:-103px;
+             font-family:lato;
+             padding:5px;
+             text-decoration:none;
+             color:white;
+             align-font: center;
+             border-radius:5px;
+             border-color:#00bbf9;
+             border-style:solid;
+          }
+    
+          @media (max-width:1600px) {
+          #room_3 {
+             left:1337px;
+    
+          }
+          }
+             .g-signin2 {
+                display:inline;
+                position:relative;
+                top:450px;
+                left: 850px;
+             }
+
+             @media (max-width: 1600px) {
+                .g-signin2 {
+                    left:650px;
+                }
+             }
+          #logout_g {
+             display: block;
+             position: relative;
+             top: 40px;
+             left: 25px;
+             
+          }
+          .before-logo {
+             position: relative;
+             display: inline;
+             top:150px;
+             left: 775px;
+             text-align: center;
+             margin-left: auto;
+             margin-right: auto;
+             width: 15%;
+             height: auto;
+             padding-bottom:0px;
+             
+                      }
+       /* responsive, for small screens, use larger image size */
+    
+       @media (max-width: 1600px) {
+          .before-logo {
+             position: relative;
+             display: inline;
+             top:140px;
+             left: 565px;
+             margin-left:auto;
+             margin-right: auto;
+             width: 21%;
+             height: auto;
+          }
+       }
+    
+       #before2 {
+           background-color: #ece9ec;
+           position:fixed;
+           top: 150px;
+           left: 730px;
+           width: 20%;
+           height: 450px;
+           border-radius: 50px;
+           z-index: -1;
+           border: solid;
+           border-color: #00bbf9;
+           
+           
+       }
+       @media (max-width: 1600px) {
+          #before2 {
+                left:513px;
+                width: 28%;
+
+          }
+       }
+        #access {
+            position: relative;
+            left: 20px;
+        }
+       
+           </style>
+    
+
+    
+
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id" content="475407914101-vsg68vsqhnr536vsmv430o7bpv96isur.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    
+    <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+    
+    <div id="logout_g" style="display:none;">
+        <a href="#" onclick="signOut();">Sign out</a>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script>
+        
+        function signOut() {
+            var auth2 = gapi.auth2.getAuthInstance();
+            auth2.signOut().then(function () {
+                console.log('User signed out.');
+                location.reload();
+            });
+        }
+
+        function onSignIn(googleUser) {
+            // Useful data for your client-side scripts:
+            var profile = googleUser.getBasicProfile();
+            console.log("ID: " + profile.getId()); // Don't send this directly to your server!
+            console.log('Full Name: ' + profile.getName());
+            console.log('Given Name: ' + profile.getGivenName());
+            console.log('Family Name: ' + profile.getFamilyName());
+            console.log("Image URL: " + profile.getImageUrl());
+            console.log("Email: " + profile.getEmail());
+
+
+            $.ajax({
+                        headers: { "Accept": "application/json"},
+                        type: 'POST',
+                        url: 'https://b2a553cb3290.ngrok.io/addUser',
+                        crossDomain: true,
+                        data:{"email":profile.getEmail()},
+                        beforeSend: function(xhr){
+                            xhr.withCredentials = true;
+                    },
+                        success: function(data, textStatus, request){
+                            console.log(data);
+                        }
+            });
+
+
+
+            var data = [];
+            var url = "https://28e291d8aa2a.ngrok.io/static/user.json";
+          
+            
+
+            
+
+
+
+
+            // The ID token you need to pass to your backend:
+            var id_token = googleUser.getAuthResponse().id_token;
+            console.log("ID Token: " + id_token);
+            $('#logout_g').show();
+            $('#myapp').show();
+            $('#before').hide();
+            $('#before2').hide();
+            $('.g-signin2').hide();
+        }
+      
+    </script>
+
+        <div id=before2>
+
+        </div>
+        
+        <div id="before">
+
+        
+        <a href="https://www.attench.com" target="_blank"><img
+            class=before-logo src="https://i.imgur.com/Z798AQN.png" title="source: imgur.com" /></a>
+        
+
+        </div>
+
+       
+        <div id="myapp" style="display:none;">
+            
+         
+         <body id="body">
+            <h1>Lakers Video Chatting Room</h1>
+                
+            <div id=topline>
+                <p>Video chat with sports fans anywhere in the world!</p> 
             </div>
-            <div id="chat">
-                <div id="chat-scroll">
-                    <div id="chat-content">
-                        <!-- chat content will be added dynamically here -->
-                    </div>
+            
+            <style>
+                #body {
+                 background-image: url('https://imgur.com/puly92b.png');
+                 background-size: cover;
+        
+                 }
+            </style>
+
+            <header id="header">
+               
+                <a href="https://www.attench.com" target="_blank"><img
+                    class=small-logo src="https://i.imgur.com/Z798AQN.png" title="source: imgur.com" /></a>
+
+                <a href="https://attench.com/our-team/#contactinfo"
+                target="_blank"id="report_issue" >Submit feedback</a>
+
+            <form id="access">
+
+                <label for="username">Name: </label>
+                <input type="text" name=”username” id="username">
+                <button id="join_leave">Join Room</button>
+                <button id="share_screen" disabled>Share screen</button>
+                <button id="toggle_chat" disabled>Open chat</button>
+            </form>
+            
+        </header>
+
+        <p id="other_rooms">Too loud? Join another room:</p>
+
+        <a href="https://9b833f283632.ngrok.io"><p id="room_2">Room #2</p>
+        </a>
+
+        <a href=""><p id="room_3">Room #3</p>
+        </a>
+
+         
+
+            <p id="count">Disconnected.</p>
+            
+            <div id="root">
+                <div id="container" class="container">
+                    <div id="local" class="participant"><div></div><div class="label">Me</div></div>
+                    <!-- more participants will be added dynamically here -->
                 </div>
-                <input id="chat-input" type="text">
+                <div id="chat">
+                    <div id="chat-scroll">
+                        <div id="chat-content">
+                            <!-- chat content will be added dynamically here -->
+                        </div>
+                    </div>
+                    <input id="chat-input" type="text">
+                </div>
             </div>
         </div>
+        
         <script src="https://media.twiliocdn.com/sdk/js/video/releases/2.3.0/twilio-video.min.js"></script>
         <script src="https://media.twiliocdn.com/sdk/js/conversations/releases/1.0.0/twilio-conversations.min.js"></script>
         <script src="{{ url_for('static', filename='app.js') }}"></script>
